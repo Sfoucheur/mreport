@@ -37,6 +37,24 @@ composer = (function () {
         '</div>'
         ].join("");
 
+    var _dynamicBootstrapBloc =  [
+        '<div class="structure-bloc list-group-item">',
+            '<span class="remove badge badge-danger">',
+                '<i class="fas fa-times"></i> remove',
+            '</span>',
+            '<span class="structure-description">',
+                '<input id="bootstrap_columns" type="text" class="form-control" placeholder="Ex : 6 6">',
+            '</span>',
+            '<span class="drag badge badge-default">',
+                '<i class="fas fa-arrows-alt"></i> drag',
+            '</span>',
+            '<div class="structure-html">',
+                '<div class="row bloc-content">',
+                '</div>',
+            '</div>',
+        '</div>'
+        ].join("");
+
     /*
      * _extraElementTemplate - Array. This var is used to construct extra elements and append it
      * to dom with selected HTMLTemplate
@@ -129,6 +147,7 @@ composer = (function () {
         blocs.forEach(function(elem) {
             structure.push(_blockTemplate.replace("{{{HTML}}}", elem.html).replace("{{{DESCRIPTION}}}", elem.description));
         });
+        structure.push(_dynamicBootstrapBloc);
         //Retrieve all dataviz components
         var dataviz_components = {};
         ["figure", "chart", "table", "title", "text", "iframe", "image", "map"].forEach(function(component) {
@@ -177,7 +196,7 @@ composer = (function () {
                 success: function(html) {
                     //Template parsing
                     _parseTemplate(m, html);
-
+                    
                 },
                 error: function(xhr, status, err) {
                     _alert("Erreur avec le fichier html/model-" + m + ".html " + err, "danger", true);
@@ -234,8 +253,12 @@ composer = (function () {
         // update left menu after model selection with linked structure elements
         $("#selectedModelComposer").change( _selectTemplate );
 
-        //configure modal to edit text
+        // configure modal to edit text
         $('#text-edit').on('show.bs.modal', _onTextEdit);
+        // check dynamic bloc validity
+        $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs)
+        $(document).on('keypress','#bootstrap_columns',_onlyIntegerInput);
+        
 
     };
 
@@ -453,14 +476,41 @@ composer = (function () {
 
 
 	};
-
-
+    var _handleStructureBlocs = function(){
+        var str = $(this).val().trim();
+        var regex = new RegExp(/((1[0-2]|[1-9])){0,11}(1[0-2]|[1-9])/);
+        var str_array = str.split(' ');
+        var columns_sum = str_array.reduce((total,element)=>{
+            return parseInt(total)+parseInt(element);
+        });
+        if(regex.test(str) && columns_sum==12){
+            var structure = '<div class="row bloc-content">';
+            str_array.forEach(elem =>{
+                structure+=
+                '<div class="dataviz-container col-md-'+elem+' card">\
+                        <!--dataviz component is injected here -->\
+                </div>'
+            });
+            $(this).parent().siblings(":last").html(structure+'</div>');
+        }
+        else{
+            $(this).parent().siblings(":last").html("");
+        }
+        
+    }
+    var _onlyIntegerInput = function(evt){
+        // Only ASCII charactar in that range allowed 
+        var ASCIICode = (evt.which) ? evt.which : evt.keyCode 
+        if (ASCIICode > 31 && ASCIICode!=32  && (ASCIICode < 48 || ASCIICode > 57)) 
+            return false; 
+        return true; 
+    }
     return {
         initComposer: _initComposer,
         compose: /* used by admin.js */ _compose,
         colors: /* used by wizard.js */ function () { return _HTMLTemplates[_activeHTMLTemplate].parameters.colors;},
         activeModel: /* used by wizard.js */ function () { return _HTMLTemplates[_activeHTMLTemplate];},
-        models: /* used for test pupose */ function () { return _HTMLTemplates;}
+        models: /* used for test pupose */ function () { return _HTMLTemplates;},
     }; // fin return
 
 })();
@@ -468,4 +518,6 @@ composer = (function () {
 $(document).ready(function () {
     composer.initComposer();
     wizard.init();
+
+    
 });

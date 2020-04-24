@@ -286,3 +286,8 @@ span.text-edit.badge.badge-warning {
   border: 4px solid #E91E63;
   opacity: 0.50;
 }
+
+#bootstrap_columns{
+    width: 75%;
+    display: inline-block;
+}
