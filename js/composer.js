@@ -261,6 +261,7 @@ composer = (function () {
         // check dynamic bloc validity
         $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs)
         $(document).on('keypress','#bootstrap_columns',_onlyIntegerInput);
+        $(document).on('click','.divide',_displayDivideModal);
         
 
     };
@@ -500,6 +501,10 @@ composer = (function () {
             str_array.forEach(elem =>{
                 structure+=
                 '<div class="dataviz-container col-md-'+elem+' card">\
+                        <span class="badge badge-pill badge-success divide" data-toggle="modal" data-target="#divide_form">\
+                            <i class="fas fa-columns"></i>\
+                            Diviser\
+                        </span>\
                         <!--dataviz component is injected here -->\
                 </div>'
             });
@@ -519,6 +524,9 @@ composer = (function () {
         if (ASCIICode > 31 && ASCIICode!=32  && (ASCIICode < 48 || ASCIICode > 57)) 
             return false; 
         return true; 
+    }
+    var _displayDivideModal = function(){
+        
     }
     return {
         initComposer: _initComposer,

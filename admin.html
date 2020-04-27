@@ -325,12 +325,47 @@
             </div>
         </div>
     </div>
+    <!-- Cart -->
     <div id="cd-cart">
         <a id="togglePanier" class="cd-img-replace"></a>
         <h2>Selection</h2>
         <ul class="cd-cart-items">
 
         </ul>
+    </div>
+    <!-- Structure dividing modal -->
+    <div class="modal fade" id="divide_form" tabindex="-1" role="dialog" aria-labelledby="divideForm" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="divide_title">Edition</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input id="divide_text" class="form-control">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="divide_name" id="divide_name" value="text"
+                                checked>
+                            <label class="form-check-label" for="divide_name">texte</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" disabled type="radio" name="divide_surname" id="divide_surname"
+                                value="html">
+                            <label class="form-check-label" for="divide_surname">html</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="text-save btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>
