@@ -38,12 +38,13 @@ composer = (function () {
         ].join("");
 
     var _dynamicBootstrapBloc =  [
-        '<div class="structure-bloc list-group-item">',
+        '<div class="structure-bloc list-group-item disable_dynamic">',
             '<span class="remove badge badge-danger">',
                 '<i class="fas fa-times"></i> remove',
             '</span>',
             '<span class="structure-description">',
                 '<input id="bootstrap_columns" type="text" class="form-control" placeholder="Ex : 6 6">',
+                '<p id="nb_columns" class="d-none"></p>',
             '</span>',
             '<span class="drag badge badge-default">',
                 '<i class="fas fa-arrows-alt"></i> drag',
@@ -218,6 +219,8 @@ composer = (function () {
         new Sortable(document.getElementById("structure-models"), {
             handle: '.drag', // handle's class
             dragClass: "sortable-drag",
+            filter: ".disable_dynamic",
+            preventOnFilter: false,
             group: {
                 name: 'structure',
                 pull: 'clone',
@@ -480,21 +483,33 @@ composer = (function () {
         var str = $(this).val().trim();
         var regex = new RegExp(/((1[0-2]|[1-9])){0,11}(1[0-2]|[1-9])/);
         var str_array = str.split(' ');
+        
         var columns_sum = str_array.reduce((total,element)=>{
             return parseInt(total)+parseInt(element);
         });
+        console.log(regex.test(str) && columns_sum==12);
+        
         if(regex.test(str) && columns_sum==12){
-            var structure = '<div class="row bloc-content">';
+            var columns_number = str_array.length;
+            columns_number = columns_number > 1 ? columns_number + " colonnes" : columns_number + " colonne";
+            var structure =  '\
+                <div class="report-bloc">\
+                    <h4 class="bloc-title editable-text">Titre du bloc<!-- this text is editable in composer --></h4>\
+                    <div class="row bloc-content">\
+            ';
             str_array.forEach(elem =>{
                 structure+=
                 '<div class="dataviz-container col-md-'+elem+' card">\
                         <!--dataviz component is injected here -->\
                 </div>'
             });
-            $(this).parent().siblings(":last").html(structure+'</div>');
+            $(this).parent().siblings(":last").html(structure+'</div></div>');
+            $(this).parent().parent().removeClass("disable_dynamic");
+            $(this).siblings("#nb_columns").html(columns_number);
         }
         else{
             $(this).parent().siblings(":last").html("");
+            $(this).parent().parent().addClass("disable_dynamic");
         }
         
     }

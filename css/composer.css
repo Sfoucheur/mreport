@@ -291,3 +291,9 @@ span.text-edit.badge.badge-warning {
     width: 75%;
     display: inline-block;
 }
+.sortable-chosen span input{
+    display: none !important;
+}
+.sortable-chosen span #nb_columns{
+    display: inline !important;
+}
