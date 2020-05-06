@@ -214,6 +214,7 @@ composer = (function () {
                 _configureNewBlock(evt.item);
             }
         });
+        
 
         // configure #structure-models to allow drag with clone option
         new Sortable(document.getElementById("structure-models"), {
@@ -259,9 +260,19 @@ composer = (function () {
         // configure modal to edit text
         $('#text-edit').on('show.bs.modal', _onTextEdit);
         // check dynamic bloc validity
-        $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs)
+        $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs);
         $(document).on('keypress','#bootstrap_columns',_onlyIntegerInput);
-        $(document).on('click','.divide',_displayDivideModal);
+        $(document).on('show.bs.modal','#divide_form',_displayDivideModal);
+        $('#separation_input').on('change', function(){
+            var elements = $(this).parent().next().find(".orientation_changed");
+            if($(this).val()==0){
+                elements[0].setAttribute("placeholder","Ex : 6 6");
+                elements[1].innerHTML = "Le total doit être 12";
+            }else{
+                elements[0].setAttribute("placeholder","Ex : 50 50");
+                elements[1].innerHTML = "Le total doit être 100";
+            }
+        });
         
 
     };
@@ -330,6 +341,8 @@ composer = (function () {
         $(row).find(".dataviz-container").each(function(id, col) {
             new Sortable(col, {
                 group:'dataviz',
+                filter: '.edit_columns',
+                preventOnFilter: false,
                 animation: 150,
                 onAdd: function (/**Event*/evt) {
                     //Test if title component
@@ -488,8 +501,6 @@ composer = (function () {
         var columns_sum = str_array.reduce((total,element)=>{
             return parseInt(total)+parseInt(element);
         });
-        console.log(regex.test(str) && columns_sum==12);
-        
         if(regex.test(str) && columns_sum==12){
             var columns_number = str_array.length;
             columns_number = columns_number > 1 ? columns_number + " colonnes" : columns_number + " colonne";
@@ -500,12 +511,19 @@ composer = (function () {
             ';
             str_array.forEach(elem =>{
                 structure+=
-                '<div class="dataviz-container col-md-'+elem+' card">\
-                        <span class="badge badge-pill badge-success divide" data-toggle="modal" data-target="#divide_form">\
+                '<div class="col-md-'+elem+' dividedcolumn">\
+                    <div class="edit_columns">\
+                        <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
                             <i class="fas fa-columns"></i>\
                             Diviser\
                         </span>\
+                        <span class="badge badge badge-danger delete_column">\
+                            <i class="far fa-trash-alt"></i>\
+                        </span>\
+                    </div>\
+                    <div data-columns="'+elem+'" class="dataviz-container card list-group-item">\
                         <!--dataviz component is injected here -->\
+                    </div>\
                 </div>'
             });
             $(this).parent().siblings(":last").html(structure+'</div></div>');
@@ -525,7 +543,12 @@ composer = (function () {
             return false; 
         return true; 
     }
-    var _displayDivideModal = function(){
+    var _displayDivideModal = function(evt){
+        var structure = evt.relatedTarget.closest(".dataviz-container").dataset;
+        
+        
+        
+        
         
     }
     return {

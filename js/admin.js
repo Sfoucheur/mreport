@@ -225,7 +225,7 @@ admin = (function () {
                 _showDataviz();
                 var options = {
                     tokenize: false,
-                    threshold: 0.2,
+                    threshold: 0.1,
                     location: 0,
                     distance:500,
                     maxPatternLength: 70,
@@ -242,9 +242,9 @@ admin = (function () {
                 var fuse = new Fuse(data.datavizs, options);
                 $("#searchbar").on("keyup", function () {
                     $("#checkAll").prop('checked', false);
-                    var result = fuse.search($(this).val());
+                    var result = fuse.search($(this).val().trim());
                     var divs = $(".card.dataviz");
-                    if ($(this).val() != "") {
+                    if ($(this).val().trim() != "") {
                         divs.parent().addClass("hidden");
                         result.forEach(function (elem) {
                             divs.each(function () {
