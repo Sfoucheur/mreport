@@ -262,17 +262,9 @@ composer = (function () {
         // check dynamic bloc validity
         $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs);
         $(document).on('keypress','#bootstrap_columns',_onlyIntegerInput);
-        $(document).on('show.bs.modal','#divide_form',_displayDivideModal);
-        $('#separation_input').on('change', function(){
-            var elements = $(this).parent().next().find(".orientation_changed");
-            if($(this).val()==0){
-                elements[0].setAttribute("placeholder","Ex : 6 6");
-                elements[1].innerHTML = "Le total doit être 12";
-            }else{
-                elements[0].setAttribute("placeholder","Ex : 50 50");
-                elements[1].innerHTML = "Le total doit être 100";
-            }
-        });
+        $('#separation_input').on('change', _changeOrientationInput);
+        $(document).on('click','#divide_modal_btn',_saveDivideConfig);
+        
         
 
     };
@@ -492,24 +484,43 @@ composer = (function () {
 		});
 
 
-	};
-    var _handleStructureBlocs = function(){
-        var str = $(this).val().trim();
-        var regex = new RegExp(/((1[0-2]|[1-9])){0,11}(1[0-2]|[1-9])/);
-        var str_array = str.split(' ');
+    };
+    var checkHorizontalBootstrap = function(input_value){
+        var regex = new RegExp(/((1[0-2]|[1-9]) ){0,11}(1[0-2]|[1-9])/);
+        var str_array = input_value.split(' ');
         
         var columns_sum = str_array.reduce((total,element)=>{
             return parseInt(total)+parseInt(element);
         });
-        if(regex.test(str) && columns_sum==12){
-            var columns_number = str_array.length;
+        return {
+            "isValid":regex.test(input_value) && columns_sum==12,
+            "str_array":str_array
+        };
+    }
+    var checkVerticalBootstrap = function(input_value){
+        var regex = new RegExp(/(([1-9]0 )|([1-9][1-9] )|([1-9] )|(100 )){0,99}((100)|([1-9]0)|([1-9][1-9])|([1-9]))/);
+        var str_array = input_value.split(' ');
+        
+        var columns_sum = str_array.reduce((total,element)=>{
+            return parseInt(total)+parseInt(element);
+        });
+        return {
+            "isValid":regex.test(input_value) && columns_sum==100,
+            "str_array":str_array
+        };
+    }
+    var _handleStructureBlocs = function(){
+        var str = $(this).val().trim();
+        var check = checkHorizontalBootstrap(str);
+        if(check.isValid){
+            var columns_number = check.str_array.length;
             columns_number = columns_number > 1 ? columns_number + " colonnes" : columns_number + " colonne";
             var structure =  '\
                 <div class="report-bloc">\
                     <h4 class="bloc-title editable-text">Titre du bloc<!-- this text is editable in composer --></h4>\
                     <div class="row bloc-content">\
             ';
-            str_array.forEach(elem =>{
+            check.str_array.forEach(elem =>{
                 structure+=
                 '<div class="col-md-'+elem+' dividedcolumn">\
                     <div class="edit_columns">\
@@ -521,7 +532,7 @@ composer = (function () {
                             <i class="far fa-trash-alt"></i>\
                         </span>\
                     </div>\
-                    <div data-columns="'+elem+'" class="dataviz-container card list-group-item">\
+                    <div class="dataviz-container card list-group-item">\
                         <!--dataviz component is injected here -->\
                     </div>\
                 </div>'
@@ -543,9 +554,25 @@ composer = (function () {
             return false; 
         return true; 
     }
-    var _displayDivideModal = function(evt){
-        var structure = evt.relatedTarget.closest(".dataviz-container").dataset;
-        
+    var _changeOrientationInput= function(){
+        var elements = $(this).parent().next().find(".orientation_changed");
+        if($(this).val()==0){
+            elements[0].setAttribute("placeholder","Ex : 6 6");
+            elements[1].innerHTML = "Le total doit être 12";
+        }else{
+            elements[0].setAttribute("placeholder","Ex : 50 50");
+            elements[1].innerHTML = "Le total doit être 100";
+        }
+    }
+    var _saveDivideConfig = function(){
+        var columns_value = $("#dimensions_division").val().trim();
+        var columns_orientation = $("#separation_input").val().trim();
+        if(columns_orientation==0){
+            let check  = checkHorizontalBootstrap(columns_value);
+        }else{
+            let check  = checkVerticalBootstrap(columns_value);
+        }
+       
         
         
         
