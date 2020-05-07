@@ -87,6 +87,7 @@ composer = (function () {
             '<code class="dataviz-definition"></code>',
         '</li>'];
 
+    var _selectedCustomColumn = false;
     /*
      * _selectTemplate. This method is used to update structure, style  and icons store derived
      * from selected template
@@ -263,7 +264,9 @@ composer = (function () {
         $(document).on('keyup','#bootstrap_columns',_handleStructureBlocs);
         $(document).on('keypress','#bootstrap_columns',_onlyIntegerInput);
         $('#separation_input').on('change', _changeOrientationInput);
+        $(document).on('show.bs.modal','#divide_form',_displayDivideModal);
         $(document).on('click','#divide_modal_btn',_saveDivideConfig);
+       
         
         
 
@@ -350,12 +353,27 @@ composer = (function () {
                         var btn = $(evt.item).find (".tool button");
                         $(btn).removeAttr("data-target").removeAttr("data-toggle");
                         $(btn).find("i").get( 0 ).className = "far fa-comment-dots";
-                    } else if ($(evt.item).hasClass("structure-element")){
+                    } else if ($(evt.item).hasClass("structure-element") && $(evt.item).find(".editable-text:contains(edit)").length==0){
                         // add edit button near to editable text elements
                         var btn = $(evt.item).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i> edit</span>').find(".text-edit");
                     }
+                    /* TO DO FOR RESIZE */
+                    // if(!evt.from.classList.contains("list-group")){
+                    //     evt.from.style.maxHeight="125px";
+                    // }
+                    // col.classList.add("resized");
+                    // var containers = document.querySelectorAll(".composition .dataviz-container:not(.resized)");
+                    
+                    // containers.forEach(function(container){
+                    //     container.style.minHeight = col.offsetHeight+"px";
+                    // })
+                    // evt.from.style.maxHeight="unset";
+                    // col.classList.remove("resized");
+                   
                 }
             });
+            
+            
         });
 
         //enable remove buton
@@ -364,9 +382,6 @@ composer = (function () {
             $(e.currentTarget).closest(".structure-bloc").find(".dataviz").appendTo("#dataviz-items");
             $(e.currentTarget).closest(".structure-bloc").remove();
         });
-        // add edit button near to editable text elements
-        var btn = $(row).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i> edit</span>').find(".text-edit");
-
     };
 
     /*
@@ -564,16 +579,54 @@ composer = (function () {
             elements[1].innerHTML = "Le total doit être 100";
         }
     }
+    var _displayDivideModal = function(evt){
+        _selectedCustomColumn = evt.relatedTarget.parentNode.nextElementSibling;
+    }
     var _saveDivideConfig = function(){
         var columns_value = $("#dimensions_division").val().trim();
         var columns_orientation = $("#separation_input").val().trim();
         if(columns_orientation==0){
             let check  = checkHorizontalBootstrap(columns_value);
+            if(check.isValid){
+                let parent = _selectedCustomColumn.parentNode;
+                _selectedCustomColumn.className = "row";
+                _selectedCustomColumn.previousElementSibling.remove();
+                let savedContent = _selectedCustomColumn.querySelectorAll("li, div.structure-element");
+                let saved = false;
+                var structure="";
+                check.str_array.forEach(function(column){
+
+                    structure+=
+                    '<div class="col-md-'+column+' dividedcolumn">\
+                        <div class="edit_columns">\
+                            <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
+                                <i class="fas fa-columns"></i>\
+                                Diviser\
+                            </span>\
+                            <span class="badge badge badge-danger delete_column">\
+                                <i class="far fa-trash-alt"></i>\
+                            </span>\
+                        </div>\
+                        <div class="dataviz-container card list-group-item">\
+                            <!--dataviz component is injected here -->';
+                    if(!saved && savedContent!==null){
+                        saved=true;
+                        savedContent.forEach(function(elem){
+                            structure+=elem.outerHTML;
+                        });
+                    }
+                    structure+=
+                       '</div>\
+                    </div>'
+                });
+                _selectedCustomColumn.innerHTML=structure;
+                _selectedCustomColumn.replaceWith(_selectedCustomColumn.cloneNode(true));
+                _configureNewBlock(parent.querySelector(".row"));
+                $('#divide_form').modal('hide')
+            }
         }else{
             let check  = checkVerticalBootstrap(columns_value);
         }
-       
-        
         
         
         
@@ -594,3 +647,5 @@ $(document).ready(function () {
 
     
 });
+
+"<div class=\"structure-element list-group-item\" draggable=\"false\" style=\"\"><span><i class=\"fas fa-text-width\"></i></span><span class=\"structure-element-description\">Titre</span><div class=\"structure-element-html\"><div class=\"report-chart-title\" data-model-icon=\"fas fa-text-width\" data-model-title=\"Titre\"><h6 class=\"editable-text\">Titre<span data-toggle=\"modal\" data-target=\"#text-edit\" class=\"to-remove text-edit badge badge-warning\"><i class=\"fas fa-edit\"></i> edit</span></h6></div></div></div>"
