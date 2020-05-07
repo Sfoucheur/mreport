@@ -333,7 +333,6 @@ composer = (function () {
      */
 
     var _configureNewBlock = function(rows) {
-        var editcss = 
         $(rows).each(function(id,row){
             
             $(row).find(".dataviz-container").each(function(id, col) {
