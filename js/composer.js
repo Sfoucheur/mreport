@@ -212,7 +212,7 @@ composer = (function () {
             group:'structure',
             animation: 150,
             onAdd: function (/**Event*/evt) {
-                _configureNewBlock(evt.item);
+                _configureNewBlock([evt.item]);
             }
         });
         
@@ -332,56 +332,60 @@ composer = (function () {
      * and configure dataviz.
      */
 
-    var _configureNewBlock = function(row) {
-        $(row).find(".dataviz-container").each(function(id, col) {
-            new Sortable(col, {
-                group:'dataviz',
-                filter: '.edit_columns',
-                preventOnFilter: false,
-                animation: 150,
-                onAdd: function (/**Event*/evt) {
-                    //Test if title component
-                    var test_title = $(evt.item).closest(".dataviz-container").parent().hasClass("report-bloc-title");
-                    if (test_title) {
-                        //No wizard needed. autoconfig this dataviz & deactivate wizard for this dataviz
-                        var dataviz = $(evt.item).closest(".dataviz").attr("data-dataviz");
-                        var elem = $.parseHTML(composer.activeModel().dataviz_components.title.replace("{{dataviz}}", dataviz));
-                        var definition = elem[0].outerHTML;
-                        // Inject dataviz definition directy
-                        $(evt.item).find("code.dataviz-definition").text(definition);
-                        //Set title icon & deactivate wizard button
-                        var btn = $(evt.item).find (".tool button");
-                        $(btn).removeAttr("data-target").removeAttr("data-toggle");
-                        $(btn).find("i").get( 0 ).className = "far fa-comment-dots";
-                    } else if ($(evt.item).hasClass("structure-element") && $(evt.item).find(".editable-text:contains(edit)").length==0){
-                        // add edit button near to editable text elements
-                        var btn = $(evt.item).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i> edit</span>').find(".text-edit");
+    var _configureNewBlock = function(rows) {
+        var editcss = 
+        $(rows).each(function(id,row){
+            
+            $(row).find(".dataviz-container").each(function(id, col) {
+                new Sortable(col, {
+                    group:'dataviz',
+                    filter: '.edit_columns',
+                    preventOnFilter: false,
+                    animation: 150,
+                    onAdd: function (/**Event*/evt) {
+                        //Test if title component
+                        var test_title = $(evt.item).closest(".dataviz-container").parent().hasClass("report-bloc-title");
+                        if (test_title) {
+                            //No wizard needed. autoconfig this dataviz & deactivate wizard for this dataviz
+                            var dataviz = $(evt.item).closest(".dataviz").attr("data-dataviz");
+                            var elem = $.parseHTML(composer.activeModel().dataviz_components.title.replace("{{dataviz}}", dataviz));
+                            var definition = elem[0].outerHTML;
+                            // Inject dataviz definition directy
+                            $(evt.item).find("code.dataviz-definition").text(definition);
+                            //Set title icon & deactivate wizard button
+                            var btn = $(evt.item).find (".tool button");
+                            $(btn).removeAttr("data-target").removeAttr("data-toggle");
+                            $(btn).find("i").get( 0 ).className = "far fa-comment-dots";
+                        } else if ($(evt.item).hasClass("structure-element") && $(evt.item).find(".editable-text:contains(edit)").length==0){
+                            // add edit button near to editable text elements
+                            var btn = $(evt.item).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i> edit</span>').find(".text-edit");
+                        }
+                        /* TO DO FOR RESIZE */
+                        // if(!evt.from.classList.contains("list-group")){
+                        //     evt.from.style.maxHeight="125px";
+                        // }
+                        // col.classList.add("resized");
+                        // var containers = document.querySelectorAll(".composition .dataviz-container:not(.resized)");
+                        
+                        // containers.forEach(function(container){
+                        //     container.style.minHeight = col.offsetHeight+"px";
+                        // })
+                        // evt.from.style.maxHeight="unset";
+                        // col.classList.remove("resized");
+                       
                     }
-                    /* TO DO FOR RESIZE */
-                    // if(!evt.from.classList.contains("list-group")){
-                    //     evt.from.style.maxHeight="125px";
-                    // }
-                    // col.classList.add("resized");
-                    // var containers = document.querySelectorAll(".composition .dataviz-container:not(.resized)");
-                    
-                    // containers.forEach(function(container){
-                    //     container.style.minHeight = col.offsetHeight+"px";
-                    // })
-                    // evt.from.style.maxHeight="unset";
-                    // col.classList.remove("resized");
-                   
-                }
+                });
             });
-            
-            
-        });
+            $(row).find(".remove").click(function(e) {
+                //keep existing dataviz
+                $(e.currentTarget).closest(".structure-bloc").find(".dataviz").appendTo("#dataviz-items");
+                $(e.currentTarget).closest(".structure-bloc").remove();
+            });
+        })
+        
 
         //enable remove buton
-        $(row).find(".remove").click(function(e) {
-            //keep existing dataviz
-            $(e.currentTarget).closest(".structure-bloc").find(".dataviz").appendTo("#dataviz-items");
-            $(e.currentTarget).closest(".structure-bloc").remove();
-        });
+       
     };
 
     /*
@@ -537,7 +541,7 @@ composer = (function () {
             ';
             check.str_array.forEach(elem =>{
                 structure+=
-                '<div class="col-md-'+elem+' dividedcolumn">\
+                '<div class="col-md-'+elem+' dividedcolumn customBaseColumn">\
                     <div class="edit_columns">\
                         <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
                             <i class="fas fa-columns"></i>\
@@ -589,6 +593,7 @@ composer = (function () {
             let check  = checkHorizontalBootstrap(columns_value);
             if(check.isValid){
                 let parent = _selectedCustomColumn.parentNode;
+                parent.classList.remove("dividedcolumn");
                 _selectedCustomColumn.className = "row";
                 _selectedCustomColumn.previousElementSibling.remove();
                 let savedContent = _selectedCustomColumn.querySelectorAll("li, div.structure-element");
@@ -597,7 +602,7 @@ composer = (function () {
                 check.str_array.forEach(function(column){
 
                     structure+=
-                    '<div class="col-md-'+column+' dividedcolumn">\
+                    '<div class="col-md-'+column+' dividedcolumn customBaseColumn">\
                         <div class="edit_columns">\
                             <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
                                 <i class="fas fa-columns"></i>\
@@ -621,11 +626,50 @@ composer = (function () {
                 });
                 _selectedCustomColumn.innerHTML=structure;
                 _selectedCustomColumn.replaceWith(_selectedCustomColumn.cloneNode(true));
-                _configureNewBlock(parent.querySelector(".row"));
+                _configureNewBlock(parent.querySelectorAll(".row"));
                 $('#divide_form').modal('hide')
             }
         }else{
             let check  = checkVerticalBootstrap(columns_value);
+            if(check.isValid){
+                let parent = _selectedCustomColumn.parentNode;
+                parent.classList.remove("dividedcolumn");
+                _selectedCustomColumn.previousElementSibling.remove();
+                let savedContent = _selectedCustomColumn.querySelectorAll("li, div.structure-element");
+                _selectedCustomColumn.remove();
+                let saved = false;
+                var structure="";
+                check.str_array.forEach(function(row){
+
+                    structure+=
+                    '<div class="row h-'+row+' verticalDivision">\
+                        <div class="col-md-12 dividedcolumn customBaseColumn">\
+                            <div class="edit_columns">\
+                                <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
+                                    <i class="fas fa-columns"></i>\
+                                    Diviser\
+                                </span>\
+                                <span class="badge badge badge-danger delete_column">\
+                                    <i class="far fa-trash-alt"></i>\
+                                </span>\
+                            </div>\
+                            <div class="dataviz-container card list-group-item">\
+                                <!--dataviz component is injected here -->';
+                    if(!saved && savedContent!==null){
+                        saved=true;
+                        savedContent.forEach(function(elem){
+                            structure+=elem.outerHTML;
+                        });
+                    }
+                    structure+=
+                            '</div>\
+                        </div>\
+                    </div>'
+                });
+                parent.innerHTML=structure;
+                _configureNewBlock(parent.querySelectorAll(".row"));
+                $('#divide_form').modal('hide')
+            }
         }
         
         

@@ -239,8 +239,8 @@ span.structure-description {
     border: #007bff;
     border-style: ridge;
     min-height: 125px;
+    width: 100%;
 }
-
 .composition .bloc-content>.dataviz-container {
     min-height: 150px;
 }
@@ -320,7 +320,7 @@ span.text-edit.badge.badge-warning {
     opacity: 0.2;
     transition: 0.2s;
 }
-.dividedcolumn{
+.customBaseColumn{
     padding: 0;
 }
 .dividedcolumn:hover .divide_column,
@@ -333,3 +333,4 @@ span.text-edit.badge.badge-warning {
 .drag_column{
     position: unset !important;
 }
+
