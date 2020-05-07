@@ -333,4 +333,6 @@ span.text-edit.badge.badge-warning {
 .drag_column{
     position: unset !important;
 }
-
+.composition .row{
+    height: 100%;
+}
