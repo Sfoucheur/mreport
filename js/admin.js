@@ -34,7 +34,7 @@ admin = (function () {
     var _initReports = function () {
         $.ajax({
             dataType: "json",
-            url: [report.getAppConfiguration().api, "report"].join(""),
+            url: [report.getAppConfiguration().api, "report"].join("/"),
             success: function (data) {
                 _report_data = _arr2dic(data.reports, "report");
                 _appendReports();
@@ -219,17 +219,17 @@ admin = (function () {
     var _initCatalog = function () {
         $.ajax({
             dataType: "json",
-            url: [report.getAppConfiguration().api, "store"].join(""),
+            url: [report.getAppConfiguration().api, "store"].join("/"),
             success: function (data) {
                 _dataviz_data = _arr2dic(data.datavizs, "dataviz");
                 _showDataviz();
                 var options = {
-                    tokenize: false,
-                    threshold: 0.1,
+                    tokenize: true,
+                    threshold: 0.2,
                     location: 0,
-                    distance:500,
-                    maxPatternLength: 70,
-                    minMatchCharLength: 2,
+                    distance: 200,
+                    maxPatternLength: 40,
+                    minMatchCharLength: 1,
                     keys: [
                         "title",
                         "description",
@@ -242,9 +242,9 @@ admin = (function () {
                 var fuse = new Fuse(data.datavizs, options);
                 $("#searchbar").on("keyup", function () {
                     $("#checkAll").prop('checked', false);
-                    var result = fuse.search($(this).val().trim());
+                    var result = fuse.search($(this).val());
                     var divs = $(".card.dataviz");
-                    if ($(this).val().trim() != "") {
+                    if ($(this).val() != "") {
                         divs.parent().addClass("hidden");
                         result.forEach(function (elem) {
                             divs.each(function () {
@@ -322,7 +322,7 @@ admin = (function () {
             contentType: "application/json",
             type: "PUT",
             data: JSON.stringify(report_data),
-            url: [report.getAppConfiguration().api, "report_composition", report_id].join(""),
+            url: [report.getAppConfiguration().api, "report_composition", report_id].join("/"),
             success: function (data) {
                 if (data.response === "success") {
                     //update local data
@@ -356,7 +356,7 @@ admin = (function () {
             data: JSON.stringify({
                 "title": report_name
             }),
-            url: [report.getAppConfiguration().api, "report", report_id].join(""),
+            url: [report.getAppConfiguration().api, "report", report_id].join("/"),
             success: function (data) {
                 if (data.response === "success") {
                     //update local data
@@ -420,7 +420,7 @@ admin = (function () {
             contentType: "application/json",
             type: "PUT",
             data: JSON.stringify(datavizs),
-            url: [report.getAppConfiguration().api, "report_composition", report_id].join(""),
+            url: [report.getAppConfiguration().api, "report_composition", report_id].join("/"),
             success: function (data) {
                 $('#report-modal-form2').modal('hide');
                 Swal.fire(
@@ -455,7 +455,7 @@ admin = (function () {
             contentType: "application/json",
             type: "DELETE",
             data: JSON.stringify(resultArray),
-            url: [report.getAppConfiguration().api, "report_composition", report_id].join(""),
+            url: [report.getAppConfiguration().api, "report_composition", report_id].join("/"),
             success: function (data) {
                 if (data.response === "success") {
                     $('#report-modal-form').modal('hide');
@@ -493,7 +493,7 @@ admin = (function () {
             data: JSON.stringify({
                 "title": report_name
             }),
-            url: [report.getAppConfiguration().api, "report", report_id].join(""),
+            url: [report.getAppConfiguration().api, "report", report_id].join("/"),
             success: function (data) {
                 if (data.response === "success") {
                     //update local data
@@ -545,7 +545,7 @@ admin = (function () {
                     dataType: "json",
                     contentType: "application/json",
                     type: "DELETE",
-                    url: [report.getAppConfiguration().api, "report", report_id].join(""),
+                    url: [report.getAppConfiguration().api, "report", report_id].join("/"),
                     success: function (data) {
 
                         $('#report-modal-form').modal('hide');
@@ -592,7 +592,7 @@ admin = (function () {
                     dataType: "json",
                     contentType: "application/json",
                     type: "DELETE",
-                    url: [report.getAppConfiguration().api, "store", dataviz_title].join(" "),
+                    url: [report.getAppConfiguration().api, "store", dataviz_title].join("/"),
                     success: function (data) {
                         Swal.fire(
                             'Supprimée',
@@ -634,7 +634,7 @@ admin = (function () {
         $.ajax({
             dataType: "json",
             contentType: "application/json",
-            url: [report.getAppConfiguration().api, "store", id].join(""),
+            url: [report.getAppConfiguration().api, "store", id].join("/"),
             type: "POST",
             data: JSON.stringify(b),
             success: function (data) {
