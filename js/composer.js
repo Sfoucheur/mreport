@@ -504,6 +504,7 @@ composer = (function () {
 
     };
     var checkHorizontalBootstrap = function(input_value){
+        input_value = input_value.trim();
         var regex = new RegExp(/((1[0-2]|[1-9]) ){0,11}(1[0-2]|[1-9])/);
         var str_array = input_value.split(' ');
         
@@ -516,19 +517,21 @@ composer = (function () {
         };
     }
     var checkVerticalBootstrap = function(input_value){
-        var regex = new RegExp(/(([1-9]0 )|([1-9][1-9] )|([1-9] )|(100 )){0,99}((100)|([1-9]0)|([1-9][1-9])|([1-9]))/);
+        input_value = input_value.trim();
+        var regex = new RegExp(/((([27]5)|(50)) ){0,3}(([27]5)|(50)|(100))/);
+        var allowedsums = [100,75,50,25];
         var str_array = input_value.split(' ');
         
         var columns_sum = str_array.reduce((total,element)=>{
             return parseInt(total)+parseInt(element);
         });
         return {
-            "isValid":regex.test(input_value) && columns_sum==100,
+            "isValid":regex.test(input_value) && allowedsums.includes(parseInt(columns_sum)),
             "str_array":str_array
         };
     }
     var _handleStructureBlocs = function(){
-        var str = $(this).val().trim();
+        var str = $(this).val();
         var check = checkHorizontalBootstrap(str);
         if(check.isValid){
             var columns_number = check.str_array.length;
@@ -578,15 +581,15 @@ composer = (function () {
             elements[0].setAttribute("placeholder","Ex : 6 6");
             elements[1].innerHTML = "Le total doit être 12";
         }else{
-            elements[0].setAttribute("placeholder","Ex : 50 50");
-            elements[1].innerHTML = "Le total doit être 100";
+            elements[0].setAttribute("placeholder","Ex : 25 25 25 25");
+            elements[1].innerHTML = "Le total doit être inferieur ou égal à 100 avec 4 valeurs maximum";
         }
     }
     var _displayDivideModal = function(evt){
         _selectedCustomColumn = evt.relatedTarget.parentNode.nextElementSibling;
     }
     var _saveDivideConfig = function(){
-        var columns_value = $("#dimensions_division").val().trim();
+        var columns_value = $("#dimensions_division").val();
         var columns_orientation = $("#separation_input").val().trim();
         if(columns_orientation==0){
             let check  = checkHorizontalBootstrap(columns_value);
