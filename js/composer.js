@@ -419,6 +419,7 @@ composer = (function () {
             });
             //delete extra controls
             $(tmp_bloc).find(".to-remove").remove();
+            $(tmp_bloc).find(".edit_columns").remove();
             // loop on dataviz-container
             $(tmp_bloc).find(".dataviz-container").each(function(id,container) {
                 var pre_content = [];
@@ -537,9 +538,10 @@ composer = (function () {
             var columns_number = check.str_array.length;
             columns_number = columns_number > 1 ? columns_number + " colonnes" : columns_number + " colonne";
             var structure =  '\
-                <div class="report-bloc">\
+                <div class="lyrow report-bloc">\
                     <h4 class="bloc-title editable-text">Titre du bloc<!-- this text is editable in composer --></h4>\
-                    <div class="row bloc-content">\
+                    <div class="view bloc-content">\
+                    <div class="row">\
             ';
             check.str_array.forEach(elem =>{
                 structure+=
@@ -558,7 +560,7 @@ composer = (function () {
                     </div>\
                 </div>'
             });
-            $(this).parent().siblings(":last").html(structure+'</div></div>');
+            $(this).parent().siblings(":last").html(structure+'</div></div></div>');
             $(this).parent().parent().removeClass("disable_dynamic");
             $(this).siblings("#nb_columns").html(columns_number);
         }
@@ -596,11 +598,11 @@ composer = (function () {
             if(check.isValid){
                 let parent = _selectedCustomColumn.parentNode;
                 parent.classList.remove("dividedcolumn");
-                _selectedCustomColumn.className = "row";
+                _selectedCustomColumn.className = "lyrow";
                 _selectedCustomColumn.previousElementSibling.remove();
                 let savedContent = _selectedCustomColumn.querySelectorAll("li, div.structure-element");
                 let saved = false;
-                var structure="";
+                var structure="<div class='view'><div class='row'>";
                 check.str_array.forEach(function(column){
 
                     structure+=
@@ -626,6 +628,8 @@ composer = (function () {
                        '</div>\
                     </div>'
                 });
+                structure+='</div>\
+                </div>'
                 _selectedCustomColumn.innerHTML=structure;
                 _selectedCustomColumn.replaceWith(_selectedCustomColumn.cloneNode(true));
                 _configureNewBlock(parent.querySelectorAll(".row"));
@@ -644,7 +648,9 @@ composer = (function () {
                 check.str_array.forEach(function(row){
 
                     structure+=
-                    '<div class="row h-'+row+' verticalDivision">\
+                    '<div class="lyrow verticalDivision">\
+                        <div class="view">\
+                        <div class="row">\
                         <div class="col-md-12 dividedcolumn customBaseColumn">\
                             <div class="edit_columns">\
                                 <span class="badge badge badge-success divide_column" data-toggle="modal" data-target="#divide_form">\
@@ -666,10 +672,12 @@ composer = (function () {
                     structure+=
                             '</div>\
                         </div>\
+                        </div>\
+                        </div>\
                     </div>'
                 });
                 parent.innerHTML=structure;
-                _configureNewBlock(parent.querySelectorAll(".row"));
+                _configureNewBlock(parent.querySelectorAll(".row,.test"));
                 $('#divide_form').modal('hide')
             }
         }

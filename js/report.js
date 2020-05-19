@@ -593,8 +593,8 @@ report = (function() {
                 });
             }
 
-            $(el).prepend('<canvas id="' + chart.id + '-canvas" width="400" height="200"></canvas>');
-            var options = $.extend({}, commonOptions, chart.options);
+            $(el).prepend('<canvas id="' + chart.id + '-canvas"></canvas>');
+            var options = $.extend({responsive: true,maintainAspectRatio:false}, commonOptions, chart.options);
             var plugins = [];
             if (chart.plugins && chart.plugins[0] === "ChartDataLabels") {
                 plugins = [ChartDataLabels];
@@ -607,7 +607,7 @@ report = (function() {
                     datasets: datasets
                 },
                 plugins: plugins,
-                options: options
+                options: options,
             });
         } else {
             _handleVizError(el, chart.id, data);

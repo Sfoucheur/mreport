@@ -336,3 +336,13 @@ span.text-edit.badge.badge-warning {
 .composition .row{
     height: 100%;
 }
+.dataviz-container{
+    display: flex;
+    height: 100%;
+}
+.report-component{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
