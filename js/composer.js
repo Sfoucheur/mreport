@@ -334,7 +334,6 @@ composer = (function () {
 
     var _configureNewBlock = function(rows) {
         $(rows).each(function(id,row){
-            
             $(row).find(".dataviz-container").each(function(id, col) {
                 new Sortable(col, {
                     group:'dataviz',
@@ -344,6 +343,7 @@ composer = (function () {
                     onAdd: function (/**Event*/evt) {
                         //Test if title component
                         var test_title = $(evt.item).closest(".dataviz-container").parent().hasClass("report-bloc-title");
+                        
                         if (test_title) {
                             //No wizard needed. autoconfig this dataviz & deactivate wizard for this dataviz
                             var dataviz = $(evt.item).closest(".dataviz").attr("data-dataviz");
@@ -357,7 +357,7 @@ composer = (function () {
                             $(btn).find("i").get( 0 ).className = "far fa-comment-dots";
                         } else if ($(evt.item).hasClass("structure-element") && $(evt.item).find(".editable-text:contains(edit)").length==0){
                             // add edit button near to editable text elements
-                            var btn = $(evt.item).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i> edit</span>').find(".text-edit");
+                            var btn = $(evt.item).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i>edit</span>').find(".text-edit");
                         }
                         /* TO DO FOR RESIZE */
                         // if(!evt.from.classList.contains("list-group")){
@@ -373,13 +373,21 @@ composer = (function () {
                         // col.classList.remove("resized");
                        
                     }
+                    
                 });
+                $(row).find(".remove").click(function(e) {
+                    //keep existing dataviz
+                    $(e.currentTarget).closest(".structure-bloc").find(".dataviz").appendTo("#dataviz-items");
+                    $(e.currentTarget).closest(".structure-bloc").remove();
+                });
+                if($(row).find(".editable-text:contains(edit)").length==0){
+                    // add edit button near to editable text elements
+                    var btn = $(row).find(".editable-text").append('<span data-toggle="modal" data-target="#text-edit" class="to-remove text-edit badge badge-warning"><i class="fas fa-edit"></i>edit</span>').find(".text-edit");
+                }
+                
+
             });
-            $(row).find(".remove").click(function(e) {
-                //keep existing dataviz
-                $(e.currentTarget).closest(".structure-bloc").find(".dataviz").appendTo("#dataviz-items");
-                $(e.currentTarget).closest(".structure-bloc").remove();
-            });
+            
         })
         
 
@@ -560,7 +568,13 @@ composer = (function () {
                     </div>\
                 </div>'
             });
-            $(this).parent().siblings(":last").html(structure+'</div></div></div>');
+            $(this).parent().siblings(":last").html(structure+'</div></div>\
+            <div class="bloc-sources">\
+                <div class="col">\
+                    <p><i class="editable-text">SOURCE: xxx<!-- this text is editable in composer --></i></p>\
+                </div>\
+            </div>\
+            </div>');
             $(this).parent().parent().removeClass("disable_dynamic");
             $(this).siblings("#nb_columns").html(columns_number);
         }
@@ -701,5 +715,3 @@ $(document).ready(function () {
 
     
 });
-
-"<div class=\"structure-element list-group-item\" draggable=\"false\" style=\"\"><span><i class=\"fas fa-text-width\"></i></span><span class=\"structure-element-description\">Titre</span><div class=\"structure-element-html\"><div class=\"report-chart-title\" data-model-icon=\"fas fa-text-width\" data-model-title=\"Titre\"><h6 class=\"editable-text\">Titre<span data-toggle=\"modal\" data-target=\"#text-edit\" class=\"to-remove text-edit badge badge-warning\"><i class=\"fas fa-edit\"></i> edit</span></h6></div></div></div>"
