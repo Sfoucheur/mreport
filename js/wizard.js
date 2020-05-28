@@ -268,6 +268,8 @@ wizard = (function() {
         $("#w_dataviz_type").val(cfg.dataviz_type);
         $("#w_colors").val(cfg.colors);
         $("#w_label").val(cfg.label);
+        $("#w_title").val(cfg.title);
+        $("#w_desc").val(cfg.description);
         if (cfg.icon) {
             $("#w_icon").val(cfg.icon);
         }
@@ -365,7 +367,7 @@ wizard = (function() {
             var yetConfigured = $(e.relatedTarget).closest(".dataviz").find("code.dataviz-definition").text() || false;
             if (yetConfigured){
                 //Get the config
-                var _code = $($.parseHTML($(e.relatedTarget).closest(".dataviz").find("code.dataviz-definition").text())).find(".dataviz");
+                var _code = $($.parseHTML(yetConfigured)).find(".dataviz");
                 _existingConfig = $(_code).data();
                 // Get dataviz type (hugly !)
                 // check class linked to dataviz - eg : from class report-chart" --> extract chart
@@ -442,7 +444,7 @@ wizard = (function() {
             //Get dataviz component herited from template and set attributes with properties object
             var elem = $.parseHTML(composer.activeModel().dataviz_components[type].replace("{{dataviz}}", dataviz));
             attributes.forEach(function(attribute) {
-                $(elem).find(".dataviz").attr("data-" + attribute.prop, attribute.value);
+                $(elem).find(".dataviz").attr("data-" + attribute.prop, attribute.value);    
             });
 
             //set icon class from icon attribute for figures components

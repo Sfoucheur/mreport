@@ -594,6 +594,8 @@ report = (function() {
             }
 
             $(el).prepend('<canvas id="' + chart.id + '-canvas"></canvas>');
+            // Add Title and Description to the preview
+            $(el).html(_configTitleDesc(chart.title,chart.description,$(el).html()));
             var options = $.extend({responsive: true,maintainAspectRatio:false}, commonOptions, chart.options);
             var plugins = [];
             if (chart.plugins && chart.plugins[0] === "ChartDataLabels") {
@@ -622,6 +624,8 @@ report = (function() {
             if (el.getElementsByClassName("report-figure-caption").length > 0) {
                 el.getElementsByClassName("report-figure-caption")[0].textContent = data[chiffrecle.id].label[0];
             }
+            // Add Title and Description to the preview
+            el.outerHTML = _configTitleDesc(chiffrecle.title,chiffrecle.description,el.outerHTML);
         } else {
             _handleVizError(el, chiffrecle.id, data);
         }
@@ -673,20 +677,38 @@ report = (function() {
                 rows.push('<tr>' + elements.join("") + '</tr>');
 
             });
-
             var html = ['<table class="table table-bordered">',
                 '<thead class="thead-light">',
                 '<tr>' + columns.join("") + '</tr></thead>',
                 '<tbody>' + rows.join("") + '</tbody></table>'
             ].join("");
-
+            // Add Title and Description to the preview
+            html = _configTitleDesc(table.title,table.description,html);
             $(el).append(html);
 
         } else {
             _handleVizError(el, table.id, data);
         }
     };
-
+    var _configTitleDesc = function(title,description,html){
+        // Add title and description
+        if(newtitle = title){
+            html = _addTitle(html,newtitle);
+        }
+        if(newdesc = description){
+            html = _addDescription(html,newdesc);
+        }
+        return html;
+    }
+    var _addTitle = function(html,title){
+        let titleDiv = '<div class="report-chart-title" data-model-icon="fas fa-text-width" data-model-title="Titre"><h6 class="editable-text">'+title+'</h6></div>';
+        return titleDiv.concat(html);
+    }
+    var _addDescription = function(html,description){
+        let descDiv = '<div class="report-chart-summary mt-auto" data-model-icon="fas fa-align-justify" data-model-title="Description"><p class="editable-text">'+description+'</p></div>';
+        return html.concat(descDiv);
+        
+    }
     var _createText = function(data, text) {
         var el = _getDomElement("text", text.id);
         if (el && data[text.id]) {

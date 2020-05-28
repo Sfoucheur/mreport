@@ -98,3 +98,6 @@ div#preloader {
 .customBaseColumn{
     margin-bottom: 10px;
 }
+.card-body{
+    flex-direction: column;
+}

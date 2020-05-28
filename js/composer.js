@@ -137,18 +137,8 @@ composer = (function () {
         }
         //get main template div
         var page = $(html).find("template.report").get(0).content.firstElementChild.outerHTML;
-        var blocs = [];
-        //get all report-bloc and report-bloc-title
-        $(html).find("template.report-bloc, template.report-bloc-title").each(function (id, template) {
-            var elem = $(template).prop('content').firstElementChild;
-            var description = elem.getAttribute("data-model-title");
-            blocs.push({"html": elem.outerHTML, "description": description});
-        });
         //Store all blocs in structure - Array
         var structure = [];
-        blocs.forEach(function(elem) {
-            structure.push(_blockTemplate.replace("{{{HTML}}}", elem.html).replace("{{{DESCRIPTION}}}", elem.description));
-        });
         structure.push(_dynamicBootstrapBloc);
         //Retrieve all dataviz components
         var dataviz_components = {};
@@ -438,6 +428,7 @@ composer = (function () {
                     var main_position = 0;
                     if ($(item).hasClass("dataviz")) {
                         var dvz = $(item).find("code.dataviz-definition").text();
+                        dvz = _addTitleDescription(dvz);
                         main_content.push(dvz);
                         main_position = idx;
                     } else if ($(item).hasClass("structure-element")) {
@@ -469,6 +460,23 @@ composer = (function () {
 
         return _export;
     };
+
+    /**
+     * 
+     * _addTitleDescription. Add to dataviz title and description if specified in the wizard
+     */
+    var _addTitleDescription = function(dvz){
+        var dvzHTML = $($.parseHTML(dvz)[0]);
+        if(title = dvzHTML.find('.dataviz').data("title")){
+            dvzHTML.prepend('<div class="report-chart-title" data-model-icon="fas fa-text-width" data-model-title="Titre"><h6 class="editable-text">'+title+'</h6></div>');
+            dvz = dvzHTML[0].outerHTML;
+        }
+        if(description = dvzHTML.find('.dataviz').data("description")){
+            dvzHTML.append('<div class="report-chart-summary mt-auto" data-model-icon="fas fa-align-justify" data-model-title="Description"><p class="editable-text">'+description+'</p></div>');
+            dvz = dvzHTML[0].outerHTML;
+        }
+        return dvz;
+    }
 
     /*
      * _compose.  This public method is used to activate composer for a given report
