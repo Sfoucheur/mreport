@@ -137,8 +137,18 @@ composer = (function () {
         }
         //get main template div
         var page = $(html).find("template.report").get(0).content.firstElementChild.outerHTML;
+        var blocs = [];
+        //get all report-bloc and report-bloc-title
+        $(html).find("template.report-bloc, template.report-bloc-title").each(function (id, template) {
+            var elem = $(template).prop('content').firstElementChild;
+            var description = elem.getAttribute("data-model-title");
+            blocs.push({"html": elem.outerHTML, "description": description});
+        });
         //Store all blocs in structure - Array
         var structure = [];
+        blocs.forEach(function(elem) {
+            structure.push(_blockTemplate.replace("{{{HTML}}}", elem.html).replace("{{{DESCRIPTION}}}", elem.description));
+        });
         structure.push(_dynamicBootstrapBloc);
         //Retrieve all dataviz components
         var dataviz_components = {};

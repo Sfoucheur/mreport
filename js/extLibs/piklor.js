@@ -40,6 +40,7 @@
         // Handle the open element and event.
         if (options.open) {
             options.open.addEventListener(options.openEvent, function (ev) {
+                // Set tooltip Arrow on color panel opening
                 var pointer = document.getElementsByClassName("tooltip_pointer")[0];
                 self.isOpen ? (self.close(), pointer.style.display = "none") : (self.open(), pointer.style.display = "block");
                 var btn = this;
@@ -66,6 +67,7 @@
                 // check if we didn't click 'open' and 'color pallete' elements
                 if (ev.target != options.open && ev.target != self.elm && self.isOpen) {
                     self.close();
+                    // Set tooltip Arrow on Blur
                     var pointer = document.getElementsByClassName("tooltip_pointer")[0];
                     var btn = ev.target;
                     if(btn.classList.contains("colorbtn")){
