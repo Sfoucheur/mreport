@@ -136,6 +136,9 @@ wizard = (function () {
         $(".dataviz-attributes").val("");
         $("#w_dataviz_type").val("");
         $("#wizard-code").text("");
+        $(".colorbtn, .color-picker").each(function (index, elem) {
+            elem.remove();
+        })
     };
 
     /*
@@ -232,6 +235,13 @@ wizard = (function () {
                 // set chart type
                 $("#w_chart_type").val("bar");
                 $("#w_colors").val(colors.slice(0, nb_datasets).join(","));
+                let basecolors = document.getElementById("w_colors").value.split(',');
+                basecolors.forEach(function (elem) {
+                    _updateColorPicker({
+                        "save": true,
+                        "color": elem
+                    })
+                });
                 // set chart label(s)
                 if (nb_datasets === 1) {
                     $("#w_label").val("Légende");
@@ -274,10 +284,18 @@ wizard = (function () {
     _applyDatavizConfig = function (cfg) {
         // get all dataviz parameters from dataviz configuration
         $("#w_dataviz_type").val(cfg.dataviz_type);
-        $("#w_colors").val(cfg.colors);
         $("#w_label").val(cfg.label);
         $("#w_title").val(cfg.title);
         $("#w_desc").val(cfg.description);
+        // Set colors for Piklor lib
+        $("#w_colors").val(cfg.colors);
+        let basecolors = document.getElementById("w_colors").value.split(',');
+        basecolors.forEach(function (elem) {
+            _updateColorPicker({
+                "save": true,
+                "color": elem
+            })
+        });
         if (cfg.icon) {
             $("#w_icon").val(cfg.icon);
         }
@@ -482,29 +500,49 @@ wizard = (function () {
             report.testViz(fdata, type, properties);
         }
     };
-    var _updateColorPicker = function () {
+    var _rgb2hex = function (rgb, hexDigits) {
+        rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        return "#" + _hex(rgb[1], hexDigits) + _hex(rgb[2], hexDigits) + _hex(rgb[3], hexDigits);
+    }
+    var _hex = function (x, hexDigits) {
+        return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+    }
+    var _updateColorPicker = function (saved) {
         var colorbtn = $("#picker-wrapper .colorbtn").length + 1;
         if (colorbtn <= 5) {
             $("#picker-wrapper").append('<div class="colorbtn colorbtn' + colorbtn + '"></div>');
+            if (saved.save)
+                $(".colorbtn" + colorbtn).css('background-color', saved.color);
             $(".chosecolors").append('<div class="available_colors color-picker' + colorbtn + '"></div>');
             var pk = new Piklor(".color-picker" + colorbtn, [
-                "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50", "#f1c40f", "#e67e22", "#e74c3c", "#ecf0f1", "#95a5a6", "#f39c12", "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d","#FFF"
+                "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50", "#f1c40f", "#e67e22", "#e74c3c", "#ecf0f1", "#95a5a6", "#f39c12", "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d", "#FFF"
             ], {
                 open: ".picker-wrapper .colorbtn" + colorbtn,
                 closeOnBlur: true
             })
+
             pk.colorChosen(function (col) {
                 $(".colorbtn" + colorbtn).css('background-color', col);
                 var pointer = document.getElementsByClassName("tooltip_pointer")[0];
                 pointer.style.display = "none";
+                var hidden_input = document.getElementById("w_colors");
+                hidden_input.value = "";
+                var hexDigits = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f");
+                $(".colorbtn").each(function (index, elem) {
+                    if (elem.style.backgroundColor != "") {
+                        hidden_input.value += _rgb2hex(elem.style.backgroundColor, hexDigits) + ",";
+                    }
+                });
+                hidden_input.value = hidden_input.value.slice(0, -1);
+
                 //Delete color TODO
                 // if(col=="#FFF"){
-                //     $(".colorbtn"+colorbtn+", .color-picker"+colorbtn).each(function(index,elem){
-                //         elem.remove();
-                        
-                //     })
+                // $(".colorbtn"+colorbtn+", .color-picker"+colorbtn).each(function(index,elem){
+                //     elem.remove();
+
+                // })
                 // }
-                
+
 
             });
         }
