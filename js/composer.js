@@ -433,7 +433,10 @@ composer = (function () {
                         main_position = idx;
                     } else if ($(item).hasClass("structure-element")) {
                         var txt = $(item).find(".structure-element-html").html();
-                        if (idx > main_position) {
+                        if(idx==0){
+                            main_content.push(txt);
+                        }
+                        else if (idx > main_position) {
                             post_content.push(txt);
                         } else {
                             pre_content.push(txt);
@@ -442,9 +445,12 @@ composer = (function () {
                     }
               });
               var tmp = $.parseHTML(main_content.join(""));
+
               $(tmp).prepend(pre_content.join(""));
               $(tmp).append(post_content.join(""));
               $(container).html(tmp);
+              console.log(tmp);
+              
             });
             html.push($(tmp_bloc).get(0).outerHTML);
         });
